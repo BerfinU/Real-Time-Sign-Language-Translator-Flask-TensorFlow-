@@ -13,17 +13,22 @@ This project is a real-time sign language recognition and translation system bui
 
 ## Project Structure
 
-├── app2.py                  # Flask application entry point
-├── main.py                  # Real-time camera handling & server events
-├── model.py                 # TensorFlow LSTM model architecture
-├── best_model_temp.keras    # Trained model file
-├── data_collection.py       # Gesture recording & preprocessing
-├── my_functions.py          # Helper utilities
-├── actions.npy              # List of trained action labels
-├── index.html               # Frontend UI
-├── requirements.txt         # Required packages
-└── README.md                # Project documentation
+<pre><code>
+## Project Structure
 
+```
+├── app2.py                  # Flask application entry point
+├── main.py                 # Real-time camera handling & server events
+├── model.py                # TensorFlow LSTM model architecture
+├── best_model_temp.keras   # Trained model file
+├── data_collection.py      # Gesture recording & preprocessing
+├── my_functions.py         # Helper utilities
+├── actions.npy             # List of trained action labels
+├── index.html              # Frontend UI
+├── requirements.txt        # Required packages
+└── README.md               # Project documentation
+```
+</code></pre>
 
 ## Installation & Setup
 
@@ -40,8 +45,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 ```
-
-## Running the App
 
 # Run the Flask app
 python3 app2.py
