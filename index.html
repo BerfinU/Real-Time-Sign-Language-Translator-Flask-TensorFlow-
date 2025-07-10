@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İşaret Dili Çevirici ✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+            background: linear-gradient(135deg,#fdfeff 0%,#f7f8fa 50%,#f0f2f5 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1a202c;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .header h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg,#2d3748,#4a5568,#718096);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            letter-spacing: -2px;
+            text-transform: lowercase;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .content-grid {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            min-height: 500px;
+            align-items: stretch;
+        }
+
+        .camera-section,.translation-section {
+            background: rgba(255,255,255,0.9);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(45,55,72,0.04);
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .camera-wrapper {
+            position: relative;
+            width: 100%;
+            height: 360px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);
+        }
+
+        .camera-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(148,163,184,0.2);
+            border-radius: 20px;
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 500;
+            flex-direction: column;
+        }
+
+        .camera-placeholder::before {
+            content: "📷";
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            display: none;
+        }
+
+        .translation-display {
+            background: linear-gradient(135deg,#f8fafc 0%,#ffffff 100%);
+            border-radius: 20px;
+            padding: 30px;
+            height: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgba(203,213,225,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .translation-display::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg,transparent 0%,rgba(255,255,255,0.1) 50%,transparent 100%);
+            pointer-events: none;
+        }
+
+        .sentence-text {
+            font-size: 1.8rem;
+            color: #2d3748;
+            line-height: 1.6;
+            font-weight: 600;
+            text-align: center;
+            min-height: 3rem;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sentence-text.empty {
+            color: #a0aec0;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        /* Mevcut kelime gösterimi */
+        .current-word-display {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            border: 2px solid rgba(33, 150, 243, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .current-word-display.stable {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .current-word-display.no-hands {
+            background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
+            border-color: rgba(244, 67, 54, 0.2);
+        }
+
+        .current-word {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2196F3;
+            margin-bottom: 8px;
+        }
+
+        .current-word.stable {
+            color: #4CAF50;
+        }
+
+        .current-word.no-hands {
+            color: #F44336;
+        }
+
+        .word-info {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 18px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before { left: 100%; }
+
+        .btn-primary {
+            background: linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);
+            color: #2d3748;
+            box-shadow: 0 4px 15px rgba(45,55,72,0.08);
+            border: 1px solid rgba(203,213,225,0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45,55,72,0.12);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            border: 1px solid rgba(203,213,225,0.15);
+            box-shadow: 0 3px 12px rgba(45,55,72,0.06);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45,55,72,0.1);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);
+            color: #2d3748;
+            box-shadow: 0 3px 12px rgba(45,55,72,0.06);
+            border: 1px solid rgba(203,213,225,0.15);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45,55,72,0.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(45,55,72,0.04);
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg,#2d3748,#4a5568);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #a0aec0;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 20px; right: 20px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+
+        .status-success {
+            background: linear-gradient(135deg,#48bb78,#38a169);
+        }
+        .status-error {
+            background: linear-gradient(135deg,#f56565,#e53e3e);
+        }
+        .status-warning {
+            background: linear-gradient(135deg,#ed8936,#dd6b20);
+        }
+
+        .connection-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            transition: background 0.3s;
+        }
+
+        .connection-indicator.connected {
+            background: #10b981;
+        }
+
+        @media (max-width:1024px) {
+            .content-grid { flex-direction: column; gap:20px; }
+            .controls { grid-template-columns: repeat(2,1fr); }
+            .stats    { grid-template-columns: 1fr; }
+        }
+        @media (max-width:768px) {
+            .camera-wrapper,.translation-display { height:280px; }
+            .controls { grid-template-columns: 1fr; }
+            .stats    { grid-template-columns: 1fr; }
+            .sentence-text { font-size:1.4rem; }
+            .header h1 { font-size:2.5rem; }
+        }
+
+        @keyframes pulse {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-indicator" id="connectionIndicator"></div>
+    
+    <div class="header">
+        <h1>İşaret Dili Çevirici</h1>
+        <p>Kolay Kullanım</p>
+    </div>
+
+    <div class="main-container">
+        <div class="content-grid">
+            <div class="camera-section">
+                <div class="section-title">📷 Kamera Görüntüsü</div>
+                <div class="camera-wrapper">
+                    <video id="video" autoplay muted playsinline></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <div class="camera-placeholder" id="cameraPlaceholder">
+                        <div style="text-align:center;">
+                            Kameraya erişim için butona tıklayın
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="translation-section">
+                <div class="section-title">✨ Çevrilen Cümle</div>
+                
+                <!-- Mevcut kelime gösterimi -->
+                <div class="current-word-display" id="currentWordDisplay" style="display: none;">
+                    <div class="current-word" id="currentWordText">-</div>
+                    <div class="word-info">
+                        <span id="wordStability">0/2</span>
+                        <span id="wordConfidence">0%</span>
+                        <span id="handsStatus">👋</span>
+                    </div>
+                </div>
+                
+                <div class="translation-display">
+                    <div class="sentence-text empty" id="sentenceText">
+                        Cümleleriniz burada görünecek...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="cameraBtn" onclick="toggleCamera()">
+                📷 Kamerayı Başlat
+            </button>
+            <button class="btn btn-secondary" onclick="speakSentence()">
+                🔊 Cümleyi Oku
+            </button>
+            <button class="btn btn-danger" onclick="resetSentence()">
+                🗑️ Temizle
+            </button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="wordCount">0</div>
+                <div class="stat-label">Kelime Sayısı</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="sessionTime">0:00</div>
+                <div class="stat-label">Oturum Süresi</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Kullanım kolaylığı için özenle hazırlandı
+    </div>
+
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        let socket = null;
+        let video = null;
+        let canvas = null;
+        let ctx = null;
+        let cameraActive = false;
+        let frameInterval = null;
+        let sessionStartTime = Date.now();
+        let currentSentence = [];
+
+        const cameraBtn = document.getElementById('cameraBtn');
+        const videoElement = document.getElementById('video');
+        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+        const sentenceText = document.getElementById('sentenceText');
+        const connectionIndicator = document.getElementById('connectionIndicator');
+        const currentWordDisplay = document.getElementById('currentWordDisplay');
+        const currentWordText = document.getElementById('currentWordText');
+        const wordStability = document.getElementById('wordStability');
+        const wordConfidence = document.getElementById('wordConfidence');
+        const handsStatus = document.getElementById('handsStatus');
+
+        function initializeSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                connectionIndicator.classList.add('connected');
+                showStatus('Bağlantı başarılı!', 'success');
+            });
+
+            socket.on('disconnect', () => {
+                connectionIndicator.classList.remove('connected');
+                showStatus('Bağlantı kesildi!', 'error');
+            });
+
+            socket.on('status', (data) => {
+                showStatus(data.msg, 'success');
+            });
+
+            socket.on('current_word_update', (data) => {
+                updateCurrentWordDisplay(data);
+            });
+
+            socket.on('prediction_result', (data) => {
+                if (data.word) {
+                    currentSentence.push(data.word);
+                    updateSentenceDisplay();
+                    updateStats('wordCount', currentSentence.length);
+                    
+                    sentenceText.classList.add('pulse');
+                    setTimeout(() => sentenceText.classList.remove('pulse'), 400);
+                    
+                    showStatus(`${data.word_type || 'Kelime'} eklendi: ${data.word}`, 'success');
+                }
+            });
+
+            socket.on('sentence_reset', () => {
+                currentSentence = [];
+                updateSentenceDisplay();
+                updateStats('wordCount', 0);
+                currentWordDisplay.style.display = 'none';
+                showStatus('Sistem sıfırlandı', 'success');
+            });
+        }
+
+        function updateCurrentWordDisplay(data) {
+            if (data.current_word) {
+                currentWordDisplay.style.display = 'block';
+                currentWordText.textContent = data.current_word.toUpperCase();
+                wordStability.textContent = `${data.stability}/${data.required_stability || 2}`;
+                wordConfidence.textContent = `${Math.round((data.confidence || 0) * 100)}%`;
+                
+                if (data.hands_detected === false) {
+                    handsStatus.textContent = '❌';
+                    currentWordDisplay.className = 'current-word-display no-hands';
+                    currentWordText.className = 'current-word no-hands';
+                } else if (data.is_stable) {
+                    handsStatus.textContent = '✅';
+                    currentWordDisplay.className = 'current-word-display stable';
+                    currentWordText.className = 'current-word stable';
+                } else {
+                    handsStatus.textContent = '👋';
+                    currentWordDisplay.className = 'current-word-display';
+                    currentWordText.className = 'current-word';
+                }
+            } else {
+                currentWordDisplay.style.display = 'none';
+            }
+        }
+
+        function updateSentenceDisplay() {
+            if (currentSentence.length > 0) {
+                let displaySentence = [...currentSentence];
+                const singleLetters = ['r', 'i', 'n', 'a', 'f', 'c', 'e', 'b', 't'];
+                
+                if (displaySentence[0] && !singleLetters.includes(displaySentence[0])) {
+                    displaySentence[0] = displaySentence[0].charAt(0).toUpperCase() + displaySentence[0].slice(1);
+                }
+                
+                sentenceText.textContent = displaySentence.join(' ');
+                sentenceText.classList.remove('empty');
+            } else {
+                sentenceText.textContent = 'cümleleriniz burada görünecek...';
+                sentenceText.classList.add('empty');
+            }
+        }
+
+        function updateStats(statName, value) {
+            const element = document.getElementById(statName);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-indicator status-${type}`;
+            statusDiv.textContent = message;
+            document.body.appendChild(statusDiv);
+            
+            setTimeout(() => {
+                statusDiv.style.opacity = '0';
+                setTimeout(() => document.body.removeChild(statusDiv), 300);
+            }, 3000);
+        }
+
+        async function toggleCamera() {
+            if (!cameraActive) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: 640, 
+                            height: 480,
+                            frameRate: 30 
+                        } 
+                    });
+                    
+                    videoElement.srcObject = stream;
+                    videoElement.style.display = 'block';
+                    cameraPlaceholder.style.display = 'none';
+                    
+                    canvas = document.getElementById('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    ctx = canvas.getContext('2d');
+                    
+                    cameraActive = true;
+                    cameraBtn.textContent = '⏹️ kamerayı durdur';
+                    
+                    socket.emit('start_camera');
+                    startFrameCapture();
+                    
+                } catch (error) {
+                    showStatus('Kamera erişimi reddedildi!', 'error');
+                }
+            } else {
+                stopCamera();
+            }
+        }
+
+        function stopCamera() {
+            if (videoElement.srcObject) {
+                videoElement.srcObject.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+            
+            videoElement.style.display = 'none';
+            cameraPlaceholder.style.display = 'flex';
+            
+            if (frameInterval) {
+                clearInterval(frameInterval);
+                frameInterval = null;
+            }
+            
+            cameraActive = false;
+            cameraBtn.textContent = '📷 kamerayı başlat';
+        }
+
+        function startFrameCapture() {
+            frameInterval = setInterval(() => {
+                if (cameraActive && videoElement.readyState === 4) {
+                    captureFrame();
+                }
+            }, 100);
+        }
+
+        function captureFrame() {
+            ctx.drawImage(videoElement, 0, 0, 640, 480);
+            const frameData = canvas.toDataURL('image/jpeg', 0.8);
+            socket.emit('process_frame', { frame: frameData });
+        }
+
+        function speakSentence() {
+            if (currentSentence.length > 0) {
+                const text = currentSentence.join(' ');
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'tr-TR';
+                    speechSynthesis.speak(utterance);
+                } else {
+                    showStatus('Tarayıcınız sesli okumayı desteklemiyor', 'warning');
+                }
+            }
+        }
+
+        function resetSentence() {
+            socket.emit('reset_sentence');
+        }
+
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            updateStats('sessionTime', `${minutes}:${seconds.toString().padStart(2, '0')}`);
+        }, 1000);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSocket();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (cameraActive) {
+                stopCamera();
+            }
+        });
+    </script>
+</body>
+</html>
