@@ -64,7 +64,7 @@ Open your browser and navigate to: http://localhost:5000
 5. Predicted words are displayed and spoken in real time.
 
 
-## 🧠 Model Info
+##  Model Info
 
 - **Architecture:** LSTM-based sequence model  
 - **Trained on:** Custom sign gesture dataset  
