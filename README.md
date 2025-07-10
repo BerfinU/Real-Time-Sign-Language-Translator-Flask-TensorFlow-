@@ -39,7 +39,7 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-```bash
+```
 
 ## Running the App
 
@@ -67,3 +67,4 @@ See requirements.txt for full list.
 
 Developed with ❤️ by Özge Berfin Ümmetoglu
 This project was built as part of a sign language translation initiative using computer vision and deep learning.
+
