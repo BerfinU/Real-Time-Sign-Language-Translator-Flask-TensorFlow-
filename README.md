@@ -11,8 +11,6 @@ This project is a real-time sign language recognition and translation system bui
 -  Text-to-speech support (reads translated sentences aloud)
 -  Live statistics like session time and word count
 
----
-
 ## Project Structure
 
 ├── app2.py                  # Flask application entry point
@@ -31,7 +29,7 @@ This project is a real-time sign language recognition and translation system bui
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/sign-language-translator.git
+git clone https://github.com/BerfinU/sign-language-translator.git
 cd sign-language-translator
 
 # Create and activate virtual environment
@@ -41,7 +39,7 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-
+```bash
 
 ## Running the App
 
@@ -49,7 +47,6 @@ pip install -r requirements.txt
 python3 app2.py
 
 	•	Open your browser and navigate to: http://localhost:5000
-
 
  How It Works
 	1.	Click “Start Camera” on the UI.
@@ -65,10 +62,8 @@ python3 app2.py
 	•	Input: Hand landmarks (x, y, z) per frame
 	•	Output: Word or character prediction
 
-
 Requirements
 See requirements.txt for full list.
-
 
 Developed with ❤️ by Özge Berfin Ümmetoglu
 This project was built as part of a sign language translation initiative using computer vision and deep learning.
