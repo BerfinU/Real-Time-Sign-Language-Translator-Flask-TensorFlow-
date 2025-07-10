@@ -16,7 +16,7 @@ This project is a real-time sign language recognition and translation system bui
 ## Project Structure
 
 <pre><code>
-## Project Structure
+Project Structure
 
 ├── app2.py                  # Flask application entry point
 ├── main.py                 # Real-time camera handling & server events
@@ -51,6 +51,7 @@ pip install -r requirements.txt
 ## Run the Flask app
 
 python3 app2.py
+
 Open your browser and navigate to: http://localhost:5000
 
 
@@ -76,5 +77,6 @@ See requirements.txt for full list.
 
 
 Developed with ❤️ by Özge Berfin Ümmetoglu
+
 This project was built as part of a sign language translation initiative using computer vision and deep learning.
 
